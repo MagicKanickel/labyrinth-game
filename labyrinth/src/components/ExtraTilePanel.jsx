@@ -10,7 +10,7 @@ export default function ExtraTilePanel({ extraTile, canRotate, onRotate, phase }
       {phase === 'push' && (
         <button
           className="rotate-btn"
-          onClick={onRotate}
+          onClick={() => onRotate((extraTile.rotation + 90) % 360)}
           disabled={!canRotate}
           title="Extraplatte drehen"
         >
