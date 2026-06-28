@@ -1,0 +1,7 @@
+node_modules/
+labyrinth/node_modules/
+labyrinth/dist/
+server/node_modules/
+.env
+.env.local
+*.log
