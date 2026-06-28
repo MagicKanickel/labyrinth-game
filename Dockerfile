@@ -2,7 +2,7 @@
 FROM node:20-alpine AS frontend
 WORKDIR /build/labyrinth
 COPY labyrinth/package*.json ./
-RUN npm ci
+RUN npm install
 COPY labyrinth/ ./
 # Pass server URL at build time (set via Coolify env var VITE_SERVER_URL)
 ARG VITE_SERVER_URL=""
