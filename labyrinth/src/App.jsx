@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { useGame }       from './hooks/useGame';
 import { useOnlineGame } from './hooks/useOnlineGame';
 import GameConfig    from './components/GameConfig';
@@ -95,9 +95,40 @@ function OfflineGame() {
   );
 }
 
+// ── Drag-resize helper ────────────────────────────────────────────────────────
+function usePanelResize(initial, min, max) {
+  const [size, setSize] = useState(initial);
+  const sizeRef = useRef(initial);
+  useEffect(() => { sizeRef.current = size; }, [size]);
+
+  const onDragStart = useCallback((e, direction = 1) => {
+    e.preventDefault();
+    const clientX0 = e.touches ? e.touches[0].clientX : e.clientX;
+    const startSize = sizeRef.current;
+    const move = (me) => {
+      const clientX = me.touches ? me.touches[0].clientX : me.clientX;
+      setSize(Math.max(min, Math.min(max, startSize + (clientX - clientX0) * direction)));
+    };
+    const up = () => {
+      document.removeEventListener('mousemove', move);
+      document.removeEventListener('mouseup', up);
+      document.removeEventListener('touchmove', move);
+      document.removeEventListener('touchend', up);
+    };
+    document.addEventListener('mousemove', move);
+    document.addEventListener('mouseup', up);
+    document.addEventListener('touchmove', move, { passive: false });
+    document.addEventListener('touchend', up);
+  }, [min, max]);
+
+  return [size, onDragStart];
+}
+
 // ── Online game view ──────────────────────────────────────────────────────────
 function OnlineGame({ og }) {
   const [chatOpen, setChatOpen] = useState(true);
+  const [leftWidth,  startLeftResize]  = usePanelResize(210, 120, 380);
+  const [rightWidth, startRightResize] = usePanelResize(260, 150, 420);
   const { gameState, myId, chat, timeLeft, isMyTurn, pushTile, movePiece, skipMove, rotateExtra, sendChat, voteKick, returnToMenu } = og;
   if (!gameState) return <div className="online-game"><div className="status-bar">Verbinde…</div></div>;
 
@@ -135,7 +166,7 @@ function OnlineGame({ og }) {
       <div className="online-main">
 
         {/* LEFT: player list + my card */}
-        <div className="online-left">
+        <div className="online-left" style={{ width: leftWidth, minWidth: leftWidth, maxWidth: leftWidth }}>
           <div className="online-players-list">
             <div className="online-section-title">Spieler</div>
             {players.map((p, i) => (
@@ -160,6 +191,13 @@ function OnlineGame({ og }) {
             </div>
           )}
         </div>
+
+        {/* Resize handle: left ↔ center */}
+        <div
+          className="resize-handle-h"
+          onMouseDown={(e) => startLeftResize(e, 1)}
+          onTouchStart={(e) => startLeftResize(e, 1)}
+        />
 
         {/* CENTER: board + extra tile */}
         <div className="online-center">
@@ -194,8 +232,20 @@ function OnlineGame({ og }) {
           )}
         </div>
 
+        {/* Resize handle: center ↔ right (only when chat open) */}
+        {chatOpen && (
+          <div
+            className="resize-handle-h"
+            onMouseDown={(e) => startRightResize(e, -1)}
+            onTouchStart={(e) => startRightResize(e, -1)}
+          />
+        )}
+
         {/* RIGHT: collapsible chat */}
-        <div className={`online-right${chatOpen ? '' : ' chat-collapsed'}`}>
+        <div
+          className={`online-right${chatOpen ? '' : ' chat-collapsed'}`}
+          style={{ width: chatOpen ? rightWidth : 40, minWidth: chatOpen ? rightWidth : 40 }}
+        >
           {chatOpen ? (
             <ChatPanel
               chat={chat}

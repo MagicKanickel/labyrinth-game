@@ -283,7 +283,7 @@ body { background: #0d1117; color: #e8e8e8; font-family: 'Segoe UI', system-ui, 
 
 /* Left panel: players + my card */
 .online-left {
-  width: 210px; flex-shrink: 0;
+  flex-shrink: 0;
   display: flex; flex-direction: column; gap: 14px;
   padding: 12px; border-right: 1px solid #30363d; overflow-y: auto;
 }
@@ -313,11 +313,10 @@ body { background: #0d1117; color: #e8e8e8; font-family: 'Segoe UI', system-ui, 
 
 /* Right panel: chat */
 .online-right {
-  width: 260px; flex-shrink: 0;
+  flex-shrink: 0;
   display: flex; flex-direction: column;
   border-left: 1px solid #30363d;
 }
-.online-right.chat-collapsed { width: 40px; }
 .chat-open-tab {
   writing-mode: vertical-rl; text-orientation: mixed;
   background: none; border: none; color: #8b949e;
@@ -355,6 +354,17 @@ body { background: #0d1117; color: #e8e8e8; font-family: 'Segoe UI', system-ui, 
   .online-right.chat-collapsed { height: 40px; }
   .chat-open-tab { writing-mode: horizontal-tb; width: 100%; height: 40px; }
 }
+
+/* ── Panel resize handles ────────────────────────────────────────────────────── */
+.resize-handle-h {
+  width: 6px; flex-shrink: 0; cursor: col-resize;
+  position: relative; background: transparent; z-index: 5;
+}
+.resize-handle-h::after {
+  content: ''; position: absolute; inset: 30% 2px;
+  background: #30363d; border-radius: 3px; transition: background 0.15s;
+}
+.resize-handle-h:hover::after, .resize-handle-h:active::after { background: #58a65c; }
 
 /* ── Mobile board scaling ────────────────────────────────────────────────────── */
 @media (max-width: 430px) {

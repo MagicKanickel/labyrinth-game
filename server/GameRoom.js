@@ -289,15 +289,17 @@ class GameRoom {
     }
 
     this._systemChat(`⏱️ ${cp.name} hat den Zug nicht ausgeführt (${cp.timeouts}/2).`);
+    const savedTimeouts = cp.timeouts;
 
-    // Execute random push + stay
     if (this.phase === 'push') {
       const positions = getAllPushPositions(this.lastPush);
       const pick = positions[Math.floor(Math.random() * positions.length)];
       this.handlePush(cp.id, pick.side, pick.index, null);
-    }
-    if (this.phase === 'move') {
-      // Stay in place
+      // handlePush resets timeouts to 0 — restore so the upcoming move-phase
+      // timeout counts as the 2nd miss and triggers a kick
+      const p = this.players.find(p => p.id === cp.id);
+      if (p) p.timeouts = savedTimeouts;
+    } else if (this.phase === 'move') {
       this.handleMove(cp.id, cp.position.row, cp.position.col);
     }
   }
