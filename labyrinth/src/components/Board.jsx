@@ -28,8 +28,8 @@ const SLIDE_SIDE = {
   bottom: { dir: 'Bottom', dx: 0, dy:  (TILE + GAP) },
 };
 
-// Start positions per player id
-const START_POS = { '0,0': 0, '6,6': 1 };
+// Start positions per player id (all 4 corners)
+const START_POS = { '0,0': 0, '0,6': 1, '6,0': 2, '6,6': 3 };
 
 export default function Board({
   board,

@@ -63,7 +63,7 @@ export default function OnlineMenu({ nickname, onSaveNickname, onCreateLobby, on
             Lobby erstellen
           </button>
           <div className="or-divider">oder beitreten</div>
-          <div style={{ display: 'flex', gap: 8 }}>
+          <div style={{ display: 'flex', gap: 8, width: '100%' }}>
             <input
               className="code-input"
               placeholder="XXXXXX"
@@ -74,7 +74,7 @@ export default function OnlineMenu({ nickname, onSaveNickname, onCreateLobby, on
             />
             <button
               className="start-btn"
-              style={{ padding: '8px 16px', flex: 0 }}
+              style={{ padding: '8px 16px', flex: '0 0 auto', width: 'auto' }}
               disabled={!valid || joinCode.length !== 6}
               onClick={handleJoin}
             >

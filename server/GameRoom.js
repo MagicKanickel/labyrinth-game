@@ -388,6 +388,7 @@ class GameRoom {
       id, name, color, position, startPosition,
       cardCount: cards.length,
       currentCardIndex, foundAll, connected,
+      cards,
     }));
   }
 

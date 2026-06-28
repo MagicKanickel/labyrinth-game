@@ -192,7 +192,7 @@ body { background: #0d1117; color: #e8e8e8; font-family: 'Segoe UI', system-ui, 
   transition: border-color 0.2s;
 }
 .name-input { width: 100%; }
-.code-input { flex: 1; font-family: monospace; font-size: 1.1rem; letter-spacing: 3px; text-transform: uppercase; }
+.code-input { flex: 1; min-width: 0; font-family: monospace; font-size: 1.1rem; letter-spacing: 3px; text-transform: uppercase; }
 .name-input:focus, .code-input:focus, .chat-input:focus { border-color: #58a65c; }
 .online-error {
   background: #3a1a1a; border: 1px solid #e74c3c; border-radius: 6px;
@@ -275,11 +275,84 @@ body { background: #0d1117; color: #e8e8e8; font-family: 'Segoe UI', system-ui, 
 .chat-send-btn:hover:not(:disabled) { background: #2ea043; }
 .chat-send-btn:disabled { opacity: 0.4; cursor: default; }
 
-/* ── Online game layout ─────────────────────────────────────────────────────── */
-.online-layout { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-.online-board-area { flex: 1; overflow: auto; }
-.online-layout .chat-panel {
-  height: 220px; flex-shrink: 0; border-left: none; border-top: 1px solid #30363d;
+/* ── Online game (3-column Scribble.io layout) ──────────────────────────────── */
+.online-game { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+
+.online-main { display: flex; flex: 1; overflow: hidden; }
+
+/* Left panel: players + my card */
+.online-left {
+  width: 210px; flex-shrink: 0;
+  display: flex; flex-direction: column; gap: 14px;
+  padding: 12px; border-right: 1px solid #30363d; overflow-y: auto;
+}
+.online-section-title {
+  font-size: 0.72rem; color: #8b949e;
+  text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;
+}
+.online-players-list { display: flex; flex-direction: column; gap: 4px; }
+.online-player-row {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 8px; background: #21262d; border-radius: 6px;
+  border: 1px solid transparent; font-size: 0.85rem;
+}
+.online-player-row.current-turn { border-color: #58a65c; }
+.online-player-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.online-found-count { font-size: 0.72rem; color: #8b949e; white-space: nowrap; }
+
+/* Center panel: board */
+.online-center {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; overflow: auto; padding: 12px; gap: 8px;
+}
+.online-board-scroll {
+  display: flex; flex-direction: row; align-items: flex-start;
+  gap: 14px; flex-wrap: wrap; justify-content: center;
+}
+
+/* Right panel: chat */
+.online-right {
+  width: 260px; flex-shrink: 0;
+  display: flex; flex-direction: column;
+  border-left: 1px solid #30363d;
+}
+.online-right.chat-collapsed { width: 40px; }
+.chat-open-tab {
+  writing-mode: vertical-rl; text-orientation: mixed;
+  background: none; border: none; color: #8b949e;
+  cursor: pointer; padding: 12px 8px; font-size: 1rem;
+  transition: color 0.2s; width: 40px; text-align: center;
+}
+.chat-open-tab:hover { color: #c9d1d9; }
+
+/* Chat header toggle */
+.chat-header-top {
+  display: flex; align-items: center; justify-content: space-between;
+}
+.chat-toggle-btn {
+  background: none; border: none; color: #8b949e;
+  cursor: pointer; font-size: 0.9rem; padding: 2px 6px;
+  border-radius: 4px; transition: all 0.15s;
+}
+.chat-toggle-btn:hover { background: #30363d; color: #c9d1d9; }
+
+/* Mobile */
+@media (max-width: 768px) {
+  .online-main { flex-direction: column; overflow: auto; }
+  .online-left {
+    width: 100%; flex-direction: row; flex-wrap: wrap;
+    border-right: none; border-bottom: 1px solid #30363d;
+    padding: 8px; gap: 8px; overflow-y: visible;
+  }
+  .online-players-list { flex-direction: row; flex-wrap: wrap; gap: 4px; }
+  .online-my-card { flex: 1; min-width: 150px; }
+  .online-center { padding: 8px; overflow: visible; }
+  .online-right {
+    width: 100%; height: 200px; flex-shrink: 0;
+    border-left: none; border-top: 1px solid #30363d;
+  }
+  .online-right.chat-collapsed { height: 40px; }
+  .chat-open-tab { writing-mode: horizontal-tb; width: 100%; height: 40px; }
 }
 
 /* ── Matchmaking screen ─────────────────────────────────────────────────────── */

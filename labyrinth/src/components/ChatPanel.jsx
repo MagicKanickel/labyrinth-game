@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 
-export default function ChatPanel({ chat, players, myId, onSend, onVoteKick, showVotekick = true }) {
+export default function ChatPanel({ chat, players, myId, onSend, onVoteKick, showVotekick = true, onToggle }) {
   const [msg, setMsg]   = useState('');
   const bottomRef       = useRef(null);
 
@@ -20,7 +20,12 @@ export default function ChatPanel({ chat, players, myId, onSend, onVoteKick, sho
   return (
     <div className="chat-panel">
       <div className="chat-header">
-        💬 Chat
+        <div className="chat-header-top">
+          <span>💬 Chat</span>
+          {onToggle && (
+            <button className="chat-toggle-btn" onClick={onToggle} title="Chat ausblenden">✕</button>
+          )}
+        </div>
         {showVotekick && others.length > 0 && (
           <div className="votekick-section">
             {others.map(p => (

@@ -90,10 +90,11 @@ function OfflineGame() {
 
 // ── Online game view ──────────────────────────────────────────────────────────
 function OnlineGame({ og }) {
+  const [chatOpen, setChatOpen] = useState(true);
   const { gameState, myId, chat, timeLeft, isMyTurn, pushTile, movePiece, skipMove, rotateExtra, sendChat, voteKick, returnToMenu } = og;
-  if (!gameState) return <div className="app"><div className="status-bar">Verbinde…</div></div>;
+  if (!gameState) return <div className="online-game"><div className="status-bar">Verbinde…</div></div>;
 
-  const { phase, board, extraTile, players, currentPlayerIndex, lastPush, reachableTiles, newTilePos, winner, config } = gameState;
+  const { phase, board, extraTile, players, currentPlayerIndex, lastPush, reachableTiles, newTilePos, winner } = gameState;
   const currentPlayer = players[currentPlayerIndex];
   const myPlayer      = players.find(p => p.id === myId);
 
@@ -101,22 +102,15 @@ function OnlineGame({ og }) {
     phase === 'push' ? (isMyTurn ? 'Schiebe eine Platte ein' : `${currentPlayer?.name} schiebt ein…`) :
     phase === 'move' ? (isMyTurn ? 'Wähle ein Zielfeld'      : `${currentPlayer?.name} bewegt sich…`) : '';
 
-  // Adapt players for offline CardPanel (add isBot=false, currentCardIndex)
-  const adaptedPlayers = players.map(p => ({
-    ...p,
-    isBot: false,
-    cards: Array.from({ length: p.cardCount ?? 0 }, (_, i) => i + 1), // fake ids for count
-    currentCardIndex: p.currentCardIndex ?? 0,
-  }));
-
   return (
-    <div className="app online-layout">
+    <div className="online-game">
       {phase === 'end' && (winner != null ? (
         <WinOverlay winner={players[winner]} onNewGame={returnToMenu} />
       ) : (
         <WinOverlay winner={null} onNewGame={returnToMenu} abandoned />
       ))}
 
+      {/* Status bar */}
       <div className="status-bar">
         {currentPlayer && (
           <>
@@ -130,66 +124,89 @@ function OnlineGame({ og }) {
         <button className="reset-btn" onClick={returnToMenu}>Verlassen</button>
       </div>
 
-      <div className="cards-row">
-        {players.map((p, i) => {
-          // Only show MY card face-up; others see card count
-          const isMe = p.id === myId;
-          return (
-            <CardPanel
-              key={p.id}
-              player={{
-                ...p,
-                isBot: false,
-                cards: Array.from({ length: p.cardCount ?? 0 }),
-                currentCardIndex: p.currentCardIndex ?? 0,
-              }}
-              isActive={currentPlayerIndex === i && phase !== 'end'}
-              hideAll={!isMe}
-              peekable={false}
-            />
-          );
-        })}
-      </div>
+      {/* 3-column main */}
+      <div className="online-main">
 
-      <div className="board-area online-board-area">
-        {board && (
-          <Board
-            board={board}
-            players={players}
-            reachableTiles={reachableTiles ?? []}
-            phase={isMyTurn ? phase : 'spectating'}
-            lastPush={lastPush}
-            newTilePos={newTilePos}
-            animatingPlayer={null}
-            hint={null}
-            onPush={(side, index) => { if (isMyTurn && phase === 'push') pushTile(side, index); }}
-            onMove={(r, c)        => { if (isMyTurn && phase === 'move') movePiece(r, c); }}
-          />
-        )}
-        {extraTile && (
-          <ExtraTilePanel
-            extraTile={extraTile}
-            canRotate={isMyTurn && phase === 'push'}
-            onRotate={(rot) => rotateExtra(rot)}
-            phase={isMyTurn ? phase : 'spectating'}
-          />
-        )}
-      </div>
+        {/* LEFT: player list + my card */}
+        <div className="online-left">
+          <div className="online-players-list">
+            <div className="online-section-title">Spieler</div>
+            {players.map((p, i) => (
+              <div key={p.id} className={`online-player-row${currentPlayerIndex === i ? ' current-turn' : ''}`}>
+                <span className="player-dot" style={{ background: p.color }} />
+                <span className="online-player-name">{p.name}</span>
+                {p.id === myId && <span className="you-badge">Du</span>}
+                <span className="online-found-count">{Math.min(p.currentCardIndex ?? 0, p.cardCount ?? 0)}/{p.cardCount ?? 0}</span>
+              </div>
+            ))}
+          </div>
 
-      {phase === 'move' && isMyTurn && (
-        <div className="skip-bar">
-          <button className="skip-btn" onClick={skipMove}>Hier bleiben</button>
+          {myPlayer && (
+            <div className="online-my-card">
+              <div className="online-section-title">Deine Karte</div>
+              <CardPanel
+                player={myPlayer}
+                isActive={isMyTurn && phase !== 'end'}
+                hideAll={false}
+                peekable={true}
+              />
+            </div>
+          )}
         </div>
-      )}
 
-      <ChatPanel
-        chat={chat}
-        players={players}
-        myId={myId}
-        onSend={sendChat}
-        onVoteKick={voteKick}
-        showVotekick
-      />
+        {/* CENTER: board + extra tile */}
+        <div className="online-center">
+          <div className="online-board-scroll">
+            {board && (
+              <Board
+                board={board}
+                players={players}
+                reachableTiles={reachableTiles ?? []}
+                phase={isMyTurn ? phase : 'spectating'}
+                lastPush={lastPush}
+                newTilePos={newTilePos}
+                animatingPlayer={null}
+                hint={null}
+                onPush={(side, index) => { if (isMyTurn && phase === 'push') pushTile(side, index); }}
+                onMove={(r, c)        => { if (isMyTurn && phase === 'move') movePiece(r, c); }}
+              />
+            )}
+            {extraTile && (
+              <ExtraTilePanel
+                extraTile={extraTile}
+                canRotate={isMyTurn && phase === 'push'}
+                onRotate={rotateExtra}
+                phase={isMyTurn ? phase : 'spectating'}
+              />
+            )}
+          </div>
+          {phase === 'move' && isMyTurn && (
+            <div className="skip-bar">
+              <button className="skip-btn" onClick={skipMove}>Hier bleiben</button>
+            </div>
+          )}
+        </div>
+
+        {/* RIGHT: collapsible chat */}
+        <div className={`online-right${chatOpen ? '' : ' chat-collapsed'}`}>
+          {chatOpen ? (
+            <ChatPanel
+              chat={chat}
+              players={players}
+              myId={myId}
+              onSend={sendChat}
+              onVoteKick={voteKick}
+              showVotekick
+              onToggle={() => setChatOpen(false)}
+            />
+          ) : (
+            <button className="chat-open-tab" onClick={() => setChatOpen(true)} title="Chat öffnen">
+              💬
+            </button>
+          )}
+        </div>
+
+      </div>
     </div>
   );
 }
