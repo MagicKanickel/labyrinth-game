@@ -100,6 +100,7 @@ body { background: #0d1117; color: #e8e8e8; font-family: 'Segoe UI', system-ui, 
 .rotate-btn:hover:not(:disabled) { background: #388bfd; }
 .rotate-btn:disabled { opacity: 0.4; cursor: default; }
 .extra-hint { font-size: 0.7rem; color: #8b949e; text-align: center; max-width: 100px; }
+.extra-hint.hint-rotate { color: #f1c40f; font-weight: 600; }
 
 /* ── Card panel ─────────────────────────────────────────────────────────────── */
 .card-panel {
@@ -353,6 +354,16 @@ body { background: #0d1117; color: #e8e8e8; font-family: 'Segoe UI', system-ui, 
   }
   .online-right.chat-collapsed { height: 40px; }
   .chat-open-tab { writing-mode: horizontal-tb; width: 100%; height: 40px; }
+}
+
+/* ── Mobile board scaling ────────────────────────────────────────────────────── */
+@media (max-width: 430px) {
+  .online-board-scroll { zoom: 0.72; }
+  .board-area { zoom: 0.72; }
+}
+@media (min-width: 431px) and (max-width: 540px) {
+  .online-board-scroll { zoom: 0.85; }
+  .board-area { zoom: 0.85; }
 }
 
 /* ── Matchmaking screen ─────────────────────────────────────────────────────── */

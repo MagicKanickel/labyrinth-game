@@ -40,7 +40,13 @@ function OfflineGame() {
         <span className="status-phase">{phaseLabel}</span>
         {isLearning && hint && (
           <span className="hint-label">
-            💡 {hint.type === 'push' ? `Tipp: ${hint.side} → Reihe ${hint.index}` : 'Tipp: grünes Feld'}
+            {hint.type === 'push'
+              ? (() => {
+                  const sides = { left: 'Links', right: 'Rechts', top: 'Oben', bottom: 'Unten' };
+                  const steps = ((hint.rotation - extraTile.rotation + 360) % 360) / 90;
+                  return `💡 Tipp: ${sides[hint.side]} → Reihe ${hint.index + 1}${steps > 0 ? ` (${steps}× drehen)` : ''}`;
+                })()
+              : '💡 Tipp: grünes Feld'}
           </span>
         )}
         <button className="reset-btn" onClick={resetGame}>Neues Spiel</button>
@@ -76,6 +82,7 @@ function OfflineGame() {
           canRotate={isHumanTurn}
           onRotate={rotateExtra}
           phase={phase}
+          hint={isLearning ? hint : null}
         />
       </div>
 

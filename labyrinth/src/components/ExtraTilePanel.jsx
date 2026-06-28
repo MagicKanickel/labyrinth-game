@@ -1,6 +1,10 @@
 import TileView from './TileView';
 
-export default function ExtraTilePanel({ extraTile, canRotate, onRotate, phase }) {
+export default function ExtraTilePanel({ extraTile, canRotate, onRotate, phase, hint }) {
+  const rotSteps = (hint?.type === 'push' && hint.rotation != null)
+    ? ((hint.rotation - extraTile.rotation + 360) % 360) / 90
+    : 0;
+
   return (
     <div className="extra-tile-panel">
       <div className="extra-tile-label">Extraplatte</div>
@@ -9,7 +13,7 @@ export default function ExtraTilePanel({ extraTile, canRotate, onRotate, phase }
       </div>
       {phase === 'push' && (
         <button
-          className="rotate-btn"
+          className={`rotate-btn${rotSteps > 0 ? ' hint-arrow' : ''}`}
           onClick={() => onRotate((extraTile.rotation + 90) % 360)}
           disabled={!canRotate}
           title="Extraplatte drehen"
@@ -17,7 +21,10 @@ export default function ExtraTilePanel({ extraTile, canRotate, onRotate, phase }
           ↻ Drehen
         </button>
       )}
-      {phase === 'push' && canRotate && (
+      {phase === 'push' && rotSteps > 0 && (
+        <p className="extra-hint hint-rotate">💡 Noch {rotSteps}× drehen</p>
+      )}
+      {phase === 'push' && canRotate && rotSteps === 0 && (
         <p className="extra-hint">Wähle einen Pfeil um einzuschieben</p>
       )}
       {phase === 'move' && (

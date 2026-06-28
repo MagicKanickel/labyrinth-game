@@ -28,11 +28,12 @@ class Matchmaking {
 
   leave(socketId) {
     this.queue = this.queue.filter(p => p.socketId !== socketId);
-    this._broadcastStatus();
 
     if (this.queue.length < QUEUE_MIN) {
       this._stopCountdown();
     }
+
+    this._broadcastStatus();
   }
 
   _broadcastStatus() {
@@ -78,10 +79,20 @@ class Matchmaking {
       this.lobbyManager.rooms.set(roomKey, room);
     }
 
-    // Join all sockets to the room
+    // Join all sockets to the room and tell each one their identity
     for (const p of players) {
       const socket = this.io.sockets.sockets.get(p.socketId);
-      if (socket) socket.join(roomKey);
+      if (!socket) continue;
+      socket.join(roomKey);
+      socket.emit('lobby_joined', {
+        code:        roomKey,
+        isHost:      false,
+        myId:        p.socketId,
+        players:     room._publicPlayers(),
+        config:      room.config,
+        chat:        [],
+        skipWaiting: true,
+      });
     }
 
     room.startGame();

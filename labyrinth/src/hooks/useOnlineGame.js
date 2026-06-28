@@ -35,7 +35,7 @@ export function useOnlineGame() {
       setConfig(data.config);
       setChat(data.chat ?? []);
       setError(null);
-      setScreen(data.isHost ? 'waiting' : 'waiting');
+      if (!data.skipWaiting) setScreen('waiting');
     });
 
     socket.on('lobby_updated', data => {
