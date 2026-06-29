@@ -6,6 +6,12 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev", "--prefix", "labyrinth"],
       "port": 5173
+    },
+    {
+      "name": "mystic-stones",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--prefix", "mystic-stones", "--", "--port", "5174"],
+      "port": 5174
     }
   ]
 }
